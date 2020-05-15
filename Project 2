@@ -1,0 +1,399 @@
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+
+using namespace std;
+int printMenu(); // Shows the main menu
+void config(); // determines if theater.txt is already created and asks for rows cols and prices
+void printOutMap(int rows, int columns, char map[][100]); // Prints the map
+void showStats(int rows, int columns, char map[][100]);
+void restart();
+// constant variables
+const char TAKEN = '*';
+const char AVAILABLE = '#';
+const double priceMax = 20.00;
+
+
+// global variables
+char map[30][30] = {0};
+double rowPrice[100] = {0};
+double total = 0;
+int quit = 1;
+int firstTime = 1;
+int rows;
+int columns;
+int rowMax = 30;
+int columnMax = 30;
+int rowBuy, columnBuy; double cost, ans; // variables for purchasing tikets
+ifstream fin;
+
+int main() {
+  int choice;
+
+  config(); //run config function to see if theater.txt already exists
+  fin.open("theater.txt"); //open theater.txt
+  fin >> rows;
+  fin >> columns;
+
+  char map[1000][100];
+  double rowPrice[rows];
+
+  for (int i = 0; i < rows; i++) { //gets row prices from theater.txt
+    fin >> rowPrice[i];
+  }
+
+  for (int i = 0; i < rows; i++) { //sets the rows to #
+    for (int j = 0; j < columns; j++)
+      map[i][j] = AVAILABLE;
+  }
+
+  do {
+
+    choice = printMenu();
+
+    switch (choice) {
+    case 1:// shows ticket prices
+      cout << "View Seat Prices" << endl << endl;
+
+      for (int i = 0; i < rows; i++) {
+        cout << "The price for row " << i + 1 << " is: $";
+        cout << rowPrice[i] << endl;
+      }
+      break;
+    case 2:// Goes through the process of selling the ticket
+      cout << "Sell a Ticket"
+           << endl;
+           printOutMap(rows, columns, map);
+      do {
+        do {
+          cout << "Please select a row you want to sell: ";
+          do{
+          cin >> rowBuy;
+           if(rowBuy < 1|| rowBuy > rows || cin.fail()){
+              cout << "That input exceeds the range of rows or is not a number. Please Try Again: ";
+              cin.clear();
+              cin.ignore(1000, '\n');
+          }
+          }while(rowBuy < 1|| rowBuy > rows || cin.fail());
+          cout << "Please select the seat you would like to sit in: ";
+          do{
+          cin >> columnBuy;
+          if(columnBuy < 1|| columnBuy > rows || cin.fail()){
+              cout << "That input exceeds the range of seats or is not a number. Please Try Again: ";
+              cin.clear();
+              cin.ignore(1000, '\n');
+          }
+          }while(columnBuy < 1|| columnBuy > rows || cin.fail());
+
+          if (map[rowBuy - 1][columnBuy - 1] == TAKEN) {
+            cout << "Sorry, that seat is sold-out, Please select a new seat.";
+            cout << endl;
+          }
+        } while (map[rowBuy - 1][columnBuy - 1] == TAKEN);
+
+          cost = rowPrice[rowBuy - 1];
+          total = total + cost;
+          cout << "That ticket costs: " << cost << endl;
+          cout << "Confirm Purchase? Enter (1 = YES / 2 = NO)";
+          do{
+          cin >> ans;
+          if(ans < 1 || ans > 2 || cin.fail()){
+              cout << "That is not a valid input";
+              cin.clear();
+              cin.ignore(1000, '\n');
+          }
+
+          }while(ans < 1 || ans > 2 || cin.fail());
+
+
+          if (ans == 1) {
+            cout << "The ticket purchase has been confirmed." << endl;
+            map[rowBuy - 1][columnBuy - 1] = TAKEN;
+          }
+
+          cout << "Would you like to sell another seat?(1 = YES / 2 = NO)";
+          do{
+          cin >> quit;
+          if(quit < 1 || quit > 2 || cin.fail()){
+              cout << "Uh Oh you entered something that is not an option. Please try again: ";
+              cin.clear();
+              cin.ignore(1000, '\n');
+          }
+        } while(quit < 1 || quit > 2 || cin.fail());
+
+      } while (quit == 1);
+      break;
+
+    case 3: //Prints out map
+      printOutMap(rows, columns, map);
+      break;
+    case 4: //Shows all the statistics
+    showStats(rows, columns, map);
+      break;
+    case 5:
+    restart();
+    break;
+    case 6:
+    cout << "GoodBye :)" << endl;
+    break;
+    default:
+    cout << "That choice was not a valid option. Please try again";
+    }
+  } while (choice != 6);
+  fin.close(); //closes theater.txt
+  return 0;
+
+
+}
+
+void restart(){
+    cout << endl;
+    int tempHolder = 0;
+    ofstream fout;
+
+  fout.open("config.txt");
+  if (!fout.is_open()) {
+
+    ofstream outfile("config.txt");
+
+    outfile << 1;
+
+    outfile.close();
+  }
+
+  fout << 1;
+
+  fout.close();
+
+  config();
+  ifstream fin2;
+  fin2.open("theater.txt");
+  fin2 >> rows;
+  fin2 >> columns;
+  for (int i = 0; i < rows; i++) {
+
+    fin2 >> tempHolder;
+
+    rowPrice[rows];
+  }
+
+  for ( int i = 0; i < rowMax; i++ ) {
+
+      for ( int j = 0; j < columnMax; j++ ) {
+
+          map[i][j] = 0;
+
+      }
+}
+}
+
+///////////////////////////////////////////////////////////////////
+// Print Map out with given rows and colums along with map array//
+/////////////////////////////////////////////////////////////////
+
+void printOutMap(int rows, int columns, char map[][100]) {
+  cout << "       ";
+
+  for(int i = 0; i < (columns / 2) -1; i++){
+      cout << " ";
+  }
+  cout << "Seats" << endl;
+  cout << "       ";
+  for (int i = 0; i <= (columns / 10); i++) {
+    if (i == 0) {
+      cout << i << "        ";
+    } else {
+      cout << i << "         ";
+    }
+  }
+  cout << endl;
+  cout << "       ";
+  //Prints column numbers
+  if (columns < 10) {
+    for (int a = 1; a <= columns; a++) {
+      cout << a;
+    }
+  }
+
+  if (columns > 9 && columns < 20) {
+    cout << "123456789";
+    for (int a = 0; a < (columns - 9); a++) {
+      cout << a;
+    }
+  }
+
+  if (columns > 19 && columns < 30) {
+    cout << "1234567890123456789";
+    for (int a = 0; a < (columns - 19); a++) {
+      cout << a;
+    }
+  }
+
+  if (columns == 30) {
+    cout << "123456789012345678901234567890";
+  }
+  for (int i = 0; i < rows; i++) {
+      if(i <= 8 ){
+    cout << endl << "Row " << (i + 1) << "  ";
+      }
+      if(i > 8){
+          cout << endl << "Row " << (i+1) << " ";
+      }
+
+    for (int j = 0; j < columns; j++) {
+      cout << "" << map[i][j];
+    }
+  }
+  cout << endl;
+}
+
+///////////////////////////////////////////////////////////////
+// Print Menu Function                                      //
+/////////////////////////////////////////////////////////////
+int printMenu() {
+  int menuChoice;
+  cout << "***************************" << endl;
+  cout << "          Menu         " << endl;
+  cout << "  1. View Seat Prices " << endl;
+  cout << "  2. Sell Tickets" << endl;
+  cout << "  3. View Seating Chart" << endl;
+  cout << "  4. Statistics" << endl;
+  cout << "  5. Reset program" << endl;
+  cout << "  6. Ends Program" << endl << endl;
+  cout << "***************************" << endl;
+  cout << "Please Enter your choice: ";
+  do{
+  cin >> menuChoice;
+  if(menuChoice <= 0 || menuChoice > 6 || cin.fail()){
+      cout << "Sorry but your menu choice does not exist. Please try again: ";
+      cin.clear();
+      cin.ignore(1000, '\n');
+  }
+  } while(menuChoice <= 0 || menuChoice > 6 || cin.fail());
+  cout << endl;
+  return menuChoice;
+}
+
+///////////////////////////////////////////////////////////////
+// config function to determine if a file is already created//
+/////////////////////////////////////////////////////////////
+void config() {
+
+  bool start;
+  bool error = false;
+  int rows = 0;
+  int columns = 0;
+  double rowPrice[rows];
+  ifstream inFileSave;
+  ofstream outFileSave;
+
+  inFileSave.open("config.txt");
+  if (!inFileSave.is_open()) {
+    ofstream outfile("config.txt");
+
+    outfile << 1;
+
+    outfile.close();
+
+    inFileSave.open("config.txt");
+    if (!inFileSave.is_open()) {
+      error = true;
+    }
+  }
+  inFileSave >> start;
+
+  inFileSave.close();
+
+  if (start == true) {
+    outFileSave.open("config.txt");
+    if (!outFileSave.is_open()) {
+      error = true;
+    }
+
+    // Main Logo
+    cout << "======================" << endl;
+    cout << "Welcome to XYZ Theater" << endl;
+    cout << "======================" << endl;
+
+    /////////////////////////////
+    // Ask for size of Theater//
+    ///////////////////////////
+    cout << "How many rows would you like?: ";
+    do {
+      cin >> rows;
+      if (rows > rowMax || rows < 0 || cin.fail()) {
+        cout << "Sorry you entered a number that excedes the maximum row limit "
+                "or is below 0. "
+                "Please try again: ";
+                cin.clear();
+                cin.ignore(100, '\n');
+
+      }
+      }while (rows > rowMax || rows < 0 || rows == 0);
+    cout << "How many columns would you like?: ";
+    do {
+      cin >> columns;
+      if (columns > columnMax || columns < 0) {
+        cout << "Sorry you entered a number that excedes the maximum column "
+                "limit or is below 0. Please try again: ";
+      }
+    } while (columns > columnMax || columns < 0);
+
+    char map[rows][columns];
+
+
+    // set the row Prices
+    ofstream outfile("theater.txt");
+    outfile << rows << endl;
+    outfile << columns << endl;
+
+    for (int i = 0; i < rows; i++) {
+      cout << "Enter the price for row " << (i + 1) << ": $";
+      do {
+        cin >> rowPrice[i];
+
+        if (rowPrice[i] > priceMax || rowPrice[i] < 0 || cin.fail()) {
+          cout << "Sorry but the price you entered was too high or was not a number. Please try again." << endl;
+          cin.clear();
+          cin.ignore(1000, '\n');
+          i = i-1;
+        } else {
+            outfile << rowPrice[i] << endl;
+        }
+
+
+      } while (rowPrice[i] > priceMax || rowPrice[i] < 0 || cin.fail());
+
+    }
+
+    outFileSave << 0;
+  }
+
+  outFileSave.close();
+
+  if (error == true) {
+    cerr << "Could not open config.txt";
+  }
+}
+
+void showStats(int rows, int columns, char map[][100]){
+cout << "Statistics" << endl;
+      int ticketsSold = 0;
+      int seatsAvailable = 0;
+      for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+          if (map[i][j] == TAKEN)
+            ticketsSold++;
+        }
+      }
+      for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+          if (map[i][j] == AVAILABLE)
+            seatsAvailable++;
+        }
+      }
+      cout << "The amount of seats still available is: " << seatsAvailable
+           << endl;
+      cout << "The amount of tickets sold is: " << ticketsSold << endl;
+      cout << "The total revenue from ticket sales is: " << total << endl;
+}
