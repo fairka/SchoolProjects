@@ -1,0 +1,220 @@
+#include <iomanip>
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+int value(char roman); // Function to return a number based on the "roman" char
+int romanToInt(string input); // Function to change roman numeral to Integer
+string intToRoman(int num); // Function to change the final int to the final roman numeral
+
+// Main Function
+int main() {
+  string romanNumeral1;
+  string romanNumeral2;
+  int number1;
+  int number2;
+  int sum;
+  bool check = false;
+  char tryAgain;
+  int counter = 1;
+  string finalRomanSum;
+
+//set up welcome screen with a table of the roman numerals
+  cout << "=======================================" << endl;
+  cout << "Welcome to the Roman Numeral Calculator"
+       << endl;
+  cout << "=======================================" << endl << endl;
+  cout << "====================================Roman Numeral "
+          "Guide===================================="
+       << endl;
+  cout << "	                1	2	3	4	5	"
+          "6	7	8	9 "
+       << endl
+       << "____________________________________________________________________"
+          "_______________________"
+       << endl
+       << " Times One	        I	II	III	IV	V	"
+          "VI	VII	VIII	IX"
+       << endl
+       << "____________________________________________________________________"
+          "_______________________"
+       << endl
+       << " Times Ten	        X	XX	XXX	XL	L	"
+          "LX	LXX	LXXX	XC"
+       << endl
+       << "____________________________________________________________________"
+          "_______________________"
+       << endl
+       << " Times a Hundred        C	CC	CCC	" << endl
+       << "===================================================================="
+          "======================="
+       << endl
+       << endl;
+
+  do {
+
+    cout << "Enter the first roman numeral you would like to add: ";
+
+    //This section is a do while loop to ask for the roman numeral and it also
+    //tells wheather or not a character that is not a roman numeral is inputted
+    //and also if there are instances like IIIIV and so on.
+    do {
+
+      cin >> romanNumeral1; // prompt user for first roman Numeral
+      counter = 1;
+      for (int i = 0; i < romanNumeral1.size(); i++) {
+        if (romanNumeral1.at(i) != 'I' &&
+            romanNumeral1.at(i) != 'V' && // Check to see if a correct character is inputed. If not then ask again
+            romanNumeral1.at(i) != 'X' &&
+            romanNumeral1.at(i) != 'L' &&
+            romanNumeral1.at(i) != 'C') {
+          check = false;
+        } else {
+          check = true;
+
+        }
+        if (check == false) {
+          cout << endl
+               << "You typed something that was not a Roman Numeral. Please try again: ";
+        }
+      }
+
+      //Check if there is an instance of 4 of the same charecter
+      if (check == true) {
+        for (int i = 0; i < romanNumeral1.size() - 1; i++) {
+          if (romanNumeral1.at(i) == romanNumeral1.at(i + 1)) {
+            counter = counter + 1;
+          }
+          if (counter >= 4) {
+            check = false;
+          } else if(counter < 4) {
+            check = true;
+          }
+          if (check == false) {
+            cout << endl << "You typed 4 or more of the same charecter. Please try again:";
+
+          }
+        }
+      }
+    } while (check == false);
+
+    cout << endl << "Enter the second roman numeral: ";
+
+    do {
+      cin >> romanNumeral2; // prompt user for second roman Numeral
+      counter = 1;
+
+      for (int i = 0; i < romanNumeral2.size(); i++) {
+        if (romanNumeral2.at(i) != 'I' &&
+            romanNumeral2.at(i) != 'V' && // Check to see if a correct Char is inputed. If not then ask again
+            romanNumeral2.at(i) != 'X' &&
+            romanNumeral2.at(i) != 'L' &&
+            romanNumeral2.at(i) != 'C') {
+          check = false;
+        } else {
+          check = true;
+        }
+        if (check == false) {
+          cout << endl << "You typed something that was not a Roman Numeral. Please try again: ";
+        }
+      }
+      if (check == true) {
+        for (int i = 0; i < romanNumeral2.size() - 1; i++) {
+          if (romanNumeral2.at(i) == romanNumeral2.at(i + 1)) {
+            counter = counter + 1;
+          }
+          if (counter >= 4) {
+            check = false;
+          } else if(counter < 4) {
+            check = true;
+          }
+          if (check == false) {
+            cout << endl << "You typed 4 or more of the same charecter in a row. Please try again:";
+
+          }
+        }
+      }
+    } while (check == false);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    number1 = romanToInt(romanNumeral1); // inputs 1st roman numeral into romanToInt function
+
+    number2 = romanToInt(romanNumeral2); // inputs 2nd roman numeral into romanToInt function
+
+    sum = number1 + number2; // add the two roman numerals together and set it equal to sum
+    finalRomanSum = intToRoman(sum); // inputs sum into intToRoman function and outputs it as finalRomanSum
+
+    cout << endl
+         << "The sum of the two roman numerals is: " << finalRomanSum // outputs the final roman charecter
+         << endl;
+
+    cout << endl << "Try again(y/n)?: "; // Ask to try again
+    cin >> tryAgain;
+    cout << endl;
+
+    if (tryAgain == 'n') {
+      cout << "Thank you, Come again :)"
+           << endl; // if they dont want to do it again then output thank you come again.
+    }
+
+  } while (tryAgain == 'y');
+
+  return 0;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//This is a function that will return a number for a series of given character//
+///////////////////////////////////////////////////////////////////////////////
+int value(char roman) {
+
+  switch (roman) { // Switch statment to return a number based on the "roman" char
+  case 'I':
+    return 1;
+  case 'V':
+    return 5;
+  case 'X':
+    return 10;
+  case 'L':
+    return 50;
+  case 'C':
+    return 100;
+  }
+}
+//////////////////////////////////////////////////
+//Function to convert Roman Numerals to Integer//
+////////////////////////////////////////////////
+int romanToInt(string input) {
+  int lastChar;
+  int ans = 0;
+  int y = 0;
+  lastChar = input.length() - 1; // n takes and stores the last char of the given input
+
+  for (int i = lastChar; i >= 0;i--) { // sets i to the last character and works from right to left
+    if (value(input[i]) >= y) // if char "value" is greater than or = to 0 then
+
+      ans = ans + value(input[i]);// add ans to the value inputed
+    else
+      ans = ans - value(input[i]); // else if subtract ans from the value
+                                   // inputed
+
+    y = value(input[i]); // y is equal to inputed value
+  }
+  return ans; // ans is then returned to "romanToInt "
+}
+
+
+/////////////////////////////////////////////////
+//Function to convert Integer to Roman Numeral//
+///////////////////////////////////////////////
+string intToRoman(int num) {
+  string finalRoman;
+  // stores roman values of digits from 0-9
+  string C[] = {"", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"};
+  string X[] = {"", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"};
+  string I[] = {"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"};
+  finalRoman = C[num / 100] + X[(num % 100) / 10] + I[(num % 10)]; // converting to roman numeral
+  return finalRoman;
+}
